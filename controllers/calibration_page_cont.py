@@ -21,6 +21,7 @@ class CalibrationController:
     circle_min_edges = 6
     circles = [] # object to store target pixels color data
     i_circle = 0 # target circle
+    image = None
     def __init__(self):
         '''
         
@@ -124,11 +125,16 @@ class CalibrationController:
         if len(res) > 0:
             self.image_path = res
             # now start processing the image:
+            # clear earlier data:
+            self.clear_data()
             self.process_image()
         else:
             print('no image selected')
                 
     def submit_btn_clicked(self):
+        if self.image is None:
+            self.view.show_msgbox("No image selected", "Please open an image for processing", "error")
+            return
         final = np.zeros(self.image.shape, np.uint8)
         mask = np.zeros(self.gray_image.shape, np.uint8)
         black_image = np.zeros(self.image.shape, np.uint8)
@@ -159,6 +165,12 @@ class CalibrationController:
             self.set_circle_data(circle)
             self.draw_contours_from_data(image_copy, circle)
         self.view.display_image(image_copy, 4)
+        # displays a circle:
+        circle = self.circles[self.i_circle]
+        self.display_cur_circle(circle)
+        # image with concentrations:
+        self.image_with_concen = self.image.copy()
+        self.view.display_image(self.image_with_concen, 6)
         
 
     def draw_contours_from_data(self, image, circle):
@@ -227,15 +239,10 @@ class CalibrationController:
     def get_channels_mean(self, channel):
         return channel[2]/3.0 + channel[1]/3.0 + channel[0]/3.0
 
-    def cycle_btn_clicked(self):
-        if len(self.circles) == 0:
-            self.view.show_msgbox('no data!', 'no data found', 'error')
-            return
-        self.i_circle += 1
-        if self.i_circle > len(self.circles) - 1:
-            self.i_circle = 0
-        # target circle:
-        circle = self.circles[self.i_circle]
+    def display_cur_circle(self, circle):
+        '''
+        displays the current selected circle
+        '''
         # draw this circle on fake image:
         # a fake image to display circles:
         image_copy = self.image.copy()
@@ -248,6 +255,17 @@ class CalibrationController:
         self.view.display_image(image_copy, 5)
         self.view.display_result(str_result)
 
+        
+    def cycle_btn_clicked(self):
+        if len(self.circles) == 0:
+            self.view.show_msgbox('no data!', 'no data found', 'error')
+            return
+        self.i_circle += 1
+        if self.i_circle > len(self.circles) - 1:
+            self.i_circle = 0
+        # target circle:
+        circle = self.circles[self.i_circle]
+        self.display_cur_circle(circle)
 
     def set_concen_btn_clicked(self, concen):
         circle = self.circles[self.i_circle]
@@ -266,8 +284,42 @@ class CalibrationController:
         
     def link_concen_btn_clicked(self, concen_selected):
         #print(concen_selected)
+        if len(self.circles) == 0:
+            self.view.show_msgbox("No pixels Error", "No shapes found for linking!", 'error')
+            return
+        if len(concen_selected) == 0 or concen_selected == 'Nil':
+            self.view.show_msgbox("No concentrations Error", "No concentrations found for linking!", 'error')
+            return
+            
         circle = self.circles[self.i_circle]
         circle.concen = float(concen_selected)
         print("concent {} attached...".format(circle.concen))
+        # show it on display:
+        cv2.putText(self.image_with_concen, str(circle.concen), (circle.x, circle.y + 10),
+                         cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 0), 1)
+        self.view.display_image(self.image_with_concen, 6)
+
+
+    def clear_data(self):
+        '''
+
+        '''
+        self.view.clear_image(1)
+        self.view.clear_image(2)
+        self.view.clear_image(3)
+        self.view.clear_image(4)
+        self.view.clear_image(5)
+        self.view.clear_image(6)        
+        # clear data:
+        self.image = None
+        self.gray_image = None
+        self.contours = []
+        self.circles = []
+        self.concn_file_path = None
+        self.view.update_om_concen_values(['Nil'])
         
+    def purge_data_btn_clicked(self):
+        res = self.view.show_msgbox("Purge data", "Do you want to purge all data?", "yesno")
+        if res:
+            self.clear_data()
 

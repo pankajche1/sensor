@@ -120,7 +120,7 @@ class CalibrationPage(Page):
         frame_concn.grid(row=9, column=0)
         self.om_concn_var = tk.StringVar(self)
         options = ['Nil']
-        #self.om_concn_var.set(options[0])
+        self.om_concn_var.set(options[0])
         ttk.Label(frame_concn, text='Concn:') \
                            .grid(row=0, column=0)
         self.om_concen = tk.OptionMenu(frame_concn
@@ -132,6 +132,11 @@ class CalibrationPage(Page):
         btn_link_concen = ttk.Button(frame_concn, text="Link"
                                            , command = self.link_concen_btn_clicked)
         btn_link_concen.grid(row=0, column=2)
+        btn_purge_data = ttk.Button(parent, text="Purge data..."
+                                           , command = self.conts[1].purge_data_btn_clicked)
+        btn_purge_data.grid(row=10, column=0)
+        
+        
 
         
         
@@ -147,7 +152,10 @@ class CalibrationPage(Page):
         self.lbl_img4 = ttk.Label(parent, text='image 4 here')
         self.lbl_img4.grid(row = 3, column = 0)        
         self.lbl_img5 = ttk.Label(parent, text='image 5 here')
-        self.lbl_img5.grid(row = 4, column = 0)        
+        self.lbl_img5.grid(row = 4, column = 0)
+        self.lbl_img6 = ttk.Label(parent, text='Image with concentrations')
+        self.lbl_img6.grid(row = 5, column = 0)        
+        
         
     def populate_bottom_pane(self, parent):
         #self.result_var = tk.StringVar()
@@ -203,8 +211,6 @@ class CalibrationPage(Page):
     def update_threshold2_view(self, val):
         self.lbl_thr_val2['text'] = val
 
-
-        
     def display_image(self, image_array, container_id = 1):
         img_data = Image.fromarray(image_array)
         img_w, img_h = img_data.size
@@ -232,8 +238,28 @@ class CalibrationPage(Page):
         elif container_id == 5:
             self.lbl_img5.configure(image = imgtk)
             self.lbl_img5.image = imgtk
+        elif container_id == 6:
+            self.lbl_img6.configure(image = imgtk)
+            self.lbl_img6.image = imgtk
 
+    def clear_image(self, container_id):
+        '''
 
+        '''
+        target_container = None
+        if container_id == 1:
+            target_container = self.lbl_img
+        elif container_id == 2:
+            target_container = self.lbl_img2
+        elif container_id == 3:
+            target_container = self.lbl_img3
+        elif container_id == 4:
+            target_container = self.lbl_img4
+        elif container_id == 5:
+            target_container = self.lbl_img5 
+        elif container_id == 6:
+            target_container = self.lbl_img6
+        target_container.configure(image = '')
 
     def submit_btn_clicked(self):
         self.conts[1].submit_btn_clicked()
@@ -303,4 +329,6 @@ class CalibrationPage(Page):
         for string in opts:
             menu.add_command(label=string, 
                              command=lambda value=string: self.om_concn_var.set(value))
-        
+        self.om_concn_var.set(opts[0])
+
+
