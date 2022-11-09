@@ -37,87 +37,101 @@ class CalibrationPage(Page):
         self.populate_bottom_pane(frame_bottom)
 
     def populate_left_pane(self, parent):
+        row = 0
         # open button:
         #    change the function to select_image after dev
-        btn_open_image = ttk.Button(parent, text="Select Image"
+        btn_open_image = ttk.Button(parent, text="Open Image..."
                                     , command = self.conts[1].select_image_btn_clicked)
-        btn_open_image.grid(row=0, column=0)
+        btn_open_image.grid(row=row, column=0)
         # threshold:
         #   threshold 1:
-        ttk.Label(parent, text='Thresh low').grid(row=1, column=0)
-        self.thr_val1 = tk.IntVar() 
+        row += 1
+        frame_threshold = tk.LabelFrame(parent, text = 'Threshold')
+        frame_threshold.grid(row=row, column=0, padx=10, pady=10)
+        ttk.Label(frame_threshold, text='Low:').grid(row=0, column=0, sticky=tk.E)
+        self.thr_val1 = tk.IntVar()
         self.thr_val1.set(self.conts[1].threshold1)
-        self.slider_thr_val1 = ttk.Scale(parent, length=200, from_=0, to=255, orient='horizontal'
+        self.slider_thr_val1 = ttk.Scale(frame_threshold, length=200, from_=0, to=255, orient='horizontal'
                                           , command=self.update_threshold1
                                           , variable=self.thr_val1
                                           , state = 'disabled')
-        self.slider_thr_val1.grid(row=1, column=1)
+        self.slider_thr_val1.grid(row=0, column=1, padx=5, pady=5)
         
-        self.lbl_thr_val1 = ttk.Label(parent, text=str(self.thr_val1.get()))
-        self.lbl_thr_val1.grid(row=1, column=2)
-
+        self.lbl_thr_val1 = ttk.Label(frame_threshold, text=str(self.thr_val1.get()))
+        self.lbl_thr_val1.grid(row=0, column=2, sticky=tk.W)
+       
         #   threshold 2:
-        ttk.Label(parent, text='Thresh max').grid(row=2, column=0)
+        #row += 1
+        ttk.Label(frame_threshold, text='Max:').grid(row=1, column=0, sticky=tk.E)
         self.thr_val2 = tk.IntVar() 
         self.thr_val2.set(self.conts[1].threshold2)
-        self.slider_thr_val2 = ttk.Scale(parent, length=200, from_=0, to=255, orient='horizontal'
+        self.slider_thr_val2 = ttk.Scale(frame_threshold, length=200, from_=0, to=255, orient='horizontal'
                                           , command=self.update_threshold2
                                           , variable=self.thr_val2
                                           , state = 'disabled')
-        self.slider_thr_val2.grid(row=2, column=1)
+        self.slider_thr_val2.grid(row=1, column=1, padx=5, pady=5)
         
-        self.lbl_thr_val2 = ttk.Label(parent, text=str(self.thr_val2.get()))
-        self.lbl_thr_val2.grid(row=2, column=2)
-        # radius of circle to draw:
-        ttk.Label(parent, text='Radius').grid(row=3, column=0)
-        self.radius_val = tk.IntVar() 
-        self.radius_val.set(10)
-        slider_radius_val = ttk.Scale(parent, length=200, from_=0, to=50, orient='horizontal'
-                                          , command=self.update_circle_radius
-                                          , variable=self.radius_val
-                                          , state = 'disabled')
-        slider_radius_val.grid(row=3, column=1)
-        
-        self.lbl_radius_val = ttk.Label(parent, text=str(self.radius_val.get()))
-        self.lbl_radius_val.grid(row=3, column=2)
-        # varible to change the min num of edges for a polygon to be a circle:
-        ttk.Label(parent, text='Circle Edges').grid(row=4, column=0)
-        self.circle_min_edges_val = tk.StringVar()
-        self.circle_min_edges_val.set(str(self.conts[1].circle_min_edges))
-        frame_circle_min_edges = tk.Frame(parent)
-        frame_circle_min_edges.grid(row=4, column=1)
-        entry_circle_min_edges = ttk.Entry(frame_circle_min_edges
-                                           , width = 5
-                                           , textvariable = self.circle_min_edges_val)
-        entry_circle_min_edges.grid(row=0, column=0)
-        btn_circle_min_edges = ttk.Button(frame_circle_min_edges, text="Set"
-                                           , command = self.set_circle_min_edges_btn_clicked)
-        btn_circle_min_edges.grid(row=0, column=1)
-        # for attaching concentration data to circle:
-        ttk.Label(parent, text='ppm:').grid(row=5, column=0)
-        self.concen_val = tk.StringVar()
-        self.concen_val.set(str(0))
-        frame_concen = tk.Frame(parent)
-        frame_concen.grid(row=5, column=1)
-        entry_concen = ttk.Entry(frame_concen
-                                           , width = 5
-                                           , textvariable = self.concen_val)
-        entry_concen.grid(row=0, column=0)
-        btn_set_concen = ttk.Button(frame_concen, text="Set"
-                                           , command = self.set_concen_btn_clicked)
-        btn_set_concen.grid(row=0, column=1)
-        
-        # button for concentration:
-        btn_submit = ttk.Button(parent, text="Submit", command = self.submit_btn_clicked)
-        btn_submit.grid(row=6, column=0)
+        self.lbl_thr_val2 = ttk.Label(frame_threshold, text=str(self.thr_val2.get()))
+        self.lbl_thr_val2.grid(row=1, column=2, sticky=tk.W)
+        btn_submit = ttk.Button(frame_threshold, text="Set", command = self.submit_btn_clicked)
+        btn_submit.grid(row=2, column=2, padx=5, pady=5)
+
+        #        # radius of circle to draw:
+        #        row += 1
+        #        ttk.Label(parent, text='Radius').grid(row=3, column=0)
+        #        self.radius_val = tk.IntVar() 
+        #        self.radius_val.set(10)
+        #        slider_radius_val = ttk.Scale(parent, length=200, from_=0, to=50, orient='horizontal'
+        #                                          , command=self.update_circle_radius
+        #                                          , variable=self.radius_val
+        #                                          , state = 'disabled')
+        #        slider_radius_val.grid(row=row, column=1)
+        #        
+        #        self.lbl_radius_val = ttk.Label(parent, text=str(self.radius_val.get()))
+        #        self.lbl_radius_val.grid(row=row, column=2)
+        #        # varible to change the min num of edges for a polygon to be a circle:
+        #        row += 1
+        #        ttk.Label(parent, text='Circle Edges').grid(row=row, column=0)
+        #        self.circle_min_edges_val = tk.StringVar()
+        #        self.circle_min_edges_val.set(str(self.conts[1].circle_min_edges))
+        #        frame_circle_min_edges = tk.Frame(parent)
+        #        frame_circle_min_edges.grid(row=row, column=1)
+        #        entry_circle_min_edges = ttk.Entry(frame_circle_min_edges
+        #                                           , width = 5
+        #                                           , textvariable = self.circle_min_edges_val)
+        #        entry_circle_min_edges.grid(row=0, column=0)
+        #        btn_circle_min_edges = ttk.Button(frame_circle_min_edges, text="Set"
+        #                                           , command = self.set_circle_min_edges_btn_clicked)
+        #        btn_circle_min_edges.grid(row=0, column=1)
+        #        # for attaching concentration data to circle:
+        #        row += 1
+        #        ttk.Label(parent, text='ppm:').grid(row=5, column=0)
+        #        self.concen_val = tk.StringVar()
+        #        self.concen_val.set(str(0))
+        #        frame_concen = tk.Frame(parent)
+        #        frame_concen.grid(row=row, column=1)
+        #        entry_concen = ttk.Entry(frame_concen
+        #                                           , width = 5
+        #                                           , textvariable = self.concen_val)
+        #        entry_concen.grid(row=0, column=0)
+        #        btn_set_concen = ttk.Button(frame_concen, text="Set"
+        #                                           , command = self.set_concen_btn_clicked)
+        #        btn_set_concen.grid(row=0, column=1)
+        #        
+        #        # button for concentration:
+        #row += 1
+        row += 1
         btn_cycle =  ttk.Button(parent, text="Cycle", command = self.cycle_btn_clicked)
-        btn_cycle.grid(row=7, column=0)
+        
+        btn_cycle.grid(row=row, column=0)
+        row += 1
         btn_read_concn_file =  ttk.Button(parent
                                           , text="Open concn. file..."
                                           , command = self.conts[1].read_concn_file_btn_clicked)
-        btn_read_concn_file.grid(row=8, column=0)
+        btn_read_concn_file.grid(row=row, column=0)
+        row += 1
         frame_concn = tk.Frame(parent)
-        frame_concn.grid(row=9, column=0)
+        frame_concn.grid(row=row, column=0)
         self.om_concn_var = tk.StringVar(self)
         options = ['Nil']
         self.om_concn_var.set(options[0])
@@ -132,14 +146,10 @@ class CalibrationPage(Page):
         btn_link_concen = ttk.Button(frame_concn, text="Link"
                                            , command = self.link_concen_btn_clicked)
         btn_link_concen.grid(row=0, column=2)
+        row += 1
         btn_purge_data = ttk.Button(parent, text="Purge data..."
                                            , command = self.conts[1].purge_data_btn_clicked)
-        btn_purge_data.grid(row=10, column=0)
-        
-        
-
-        
-        
+        btn_purge_data.grid(row=row, column=0)
 
     def populate_right_pane(self, parent):
         # right pane:

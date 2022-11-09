@@ -157,7 +157,9 @@ class CalibrationController:
         radius = 10
         thickness = -1
         image_copy = self.image.copy()
-        
+        if len(self.circles) == 0:
+            self.view.show_msgbox("No shape found", "No shape found for display", "error")
+            return
         
         for circle in self.circles:
             # the color data from the src img:
