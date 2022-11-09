@@ -153,9 +153,9 @@ class CalibrationController:
                     y = int(M['m01']/M['m00'])
                 self.circles.append(Circle(x, y))
         #print("len(circles):{}".format(len(self.circles)))
-        color = 150
+        color = (0, 255, 255)
         radius = 10
-        thickness = -1
+        thickness = 1  # give -1 for full fill inside
         image_copy = self.image.copy()
         if len(self.circles) == 0:
             self.view.show_msgbox("No shape found", "No shape found for display", "error")
@@ -164,8 +164,12 @@ class CalibrationController:
         for circle in self.circles:
             # the color data from the src img:
             circle.indices = []
+            circle.color = color
+            circle.radius = radius
+            circle.thickness = thickness
             self.set_circle_data(circle)
-            self.draw_contours_from_data(image_copy, circle)
+            #self.draw_contours_from_data(image_copy, circle)
+            self.draw_contours_from_circle_centre(image_copy, circle)
         self.view.display_image(image_copy, 4)
         # displays a circle:
         circle = self.circles[self.i_circle]
@@ -175,6 +179,9 @@ class CalibrationController:
         self.view.display_image(self.image_with_concen, 6)
         
 
+    def draw_contours_from_circle_centre(self, image, circle):
+        cv2.circle(image, (circle.x, circle.y), circle.radius, circle.color, circle.thickness )
+        
     def draw_contours_from_data(self, image, circle):
         #print("len(circle.indices):{}".format(len(circle.indices[0])))
         for i in range(0, len(circle.indices[0])):
@@ -193,7 +200,8 @@ class CalibrationController:
         '''
         color = 150
         radius = 10
-        thickness = -1
+        thickness = -1 # for full fill inside
+        #thickness = 2
         # mask image:
         black_image = np.zeros(self.image.shape, np.uint8)
         # draw on this black image the target circle:
@@ -248,7 +256,8 @@ class CalibrationController:
         # draw this circle on fake image:
         # a fake image to display circles:
         image_copy = self.image.copy()
-        self.draw_contours_from_data(image_copy, circle)
+        #self.draw_contours_from_data(image_copy, circle)
+        self.draw_contours_from_circle_centre(image_copy, circle)
         str_result =  "       mean:  {:<.2f} \n\n".format(circle.mean)
         str_result += "simple mean:  {:<.2f} \n\n".format(circle.simple_mean)
         str_result += "     R mean:  {:<.2f} \n\n".format(circle.R_mean)

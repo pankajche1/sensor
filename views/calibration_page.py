@@ -10,7 +10,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 class CalibrationPage(Page):
-
+    images_containers = []
     def set_layout(self):
         super().set_header_layout('Calibration Section')
         header = tk.Frame(self)
@@ -152,20 +152,18 @@ class CalibrationPage(Page):
         btn_purge_data.grid(row=row, column=0)
 
     def populate_right_pane(self, parent):
-        # right pane:
-        self.lbl_img = ttk.Label(parent, text='main image here')
-        self.lbl_img.grid(row = 0, column = 0)
-        self.lbl_img2 = ttk.Label(parent, text='image 2 here')
-        self.lbl_img2.grid(row = 1, column = 0)        
-        self.lbl_img3 = ttk.Label(parent, text='image 3 here')
-        self.lbl_img3.grid(row = 2, column = 0)        
-        self.lbl_img4 = ttk.Label(parent, text='image 4 here')
-        self.lbl_img4.grid(row = 3, column = 0)        
-        self.lbl_img5 = ttk.Label(parent, text='image 5 here')
-        self.lbl_img5.grid(row = 4, column = 0)
-        self.lbl_img6 = ttk.Label(parent, text='Image with concentrations')
-        self.lbl_img6.grid(row = 5, column = 0)        
         
+        labels = ('Original image:', 'Grayscale image:', 'Contours:'
+                     , 'Detected regions of interest', 'Selected region of interest'
+                     , 'Regions of interest with concentrations')
+        row = -1
+        for lb in labels:
+            row += 1
+            ttk.Label(parent, text=lb).grid(row = row, column = 0, padx=5, pady=5, sticky=tk.W)
+            row += 1
+            img_container = ttk.Label(parent, text='')
+            img_container.grid(row = row, column = 0)
+            self.images_containers.append(img_container)
         
     def populate_bottom_pane(self, parent):
         #self.result_var = tk.StringVar()
@@ -222,6 +220,9 @@ class CalibrationPage(Page):
         self.lbl_thr_val2['text'] = val
 
     def display_image(self, image_array, container_id = 1):
+        '''
+        container_id starts with 1
+        '''
         img_data = Image.fromarray(image_array)
         img_w, img_h = img_data.size
         # resize the img so that it fits in the gui:
@@ -233,43 +234,17 @@ class CalibrationPage(Page):
             imgtk = ImageTk.PhotoImage(resized_data)
         else:
             imgtk = ImageTk.PhotoImage(img_data)
-        if container_id == 1:
-            self.lbl_img.configure(image = imgtk)
-            self.lbl_img.image = imgtk
-        elif container_id == 2:
-            self.lbl_img2.configure(image = imgtk)
-            self.lbl_img2.image = imgtk
-        elif container_id == 3:
-            self.lbl_img3.configure(image = imgtk)
-            self.lbl_img3.image = imgtk
-        elif container_id == 4:
-            self.lbl_img4.configure(image = imgtk)
-            self.lbl_img4.image = imgtk
-        elif container_id == 5:
-            self.lbl_img5.configure(image = imgtk)
-            self.lbl_img5.image = imgtk
-        elif container_id == 6:
-            self.lbl_img6.configure(image = imgtk)
-            self.lbl_img6.image = imgtk
+        img_container = self.images_containers[container_id - 1]
+        img_container.configure(image = imgtk)
+        img_container.image = imgtk
 
     def clear_image(self, container_id):
         '''
 
         '''
-        target_container = None
-        if container_id == 1:
-            target_container = self.lbl_img
-        elif container_id == 2:
-            target_container = self.lbl_img2
-        elif container_id == 3:
-            target_container = self.lbl_img3
-        elif container_id == 4:
-            target_container = self.lbl_img4
-        elif container_id == 5:
-            target_container = self.lbl_img5 
-        elif container_id == 6:
-            target_container = self.lbl_img6
-        target_container.configure(image = '')
+        img_container = self.images_containers[container_id - 1]
+        img_container.configure(image = '')
+
 
     def submit_btn_clicked(self):
         self.conts[1].submit_btn_clicked()
@@ -326,7 +301,6 @@ class CalibrationPage(Page):
                                                         "*.csv*"),
                                                        ("all files",
                                                         "*.*")))
-    
         
     def link_concen_btn_clicked(self):
         self.conts[1].link_concen_btn_clicked(self.om_concn_var.get())
